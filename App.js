@@ -6,35 +6,67 @@ import {
     StatusBar,
     Platform,
     ScrollView,
-    FlatList
+    FlatList,
+    TextInput,
+    Button,
+    KeyboardAvoidingView
 } from 'react-native';
 
 const STATUSBAR_HEIGHT = Platform.OS == 'ios' ? 20 : StatusBar.currentHeight
 
 export default class App extends React.Component {
     constructor(props) {
+        super()
         this.state = {
-            todo: [
-                {index: 1, title: 'hoge', done: false},
-                {index: 2, title: 'huga', done: false}
-            ],
-            currentIndex: 2
+            todo: [],
+            currentIndex: 0,
+            inputText: ""
         }
+    }
+
+    onAddItem = () => {
+        const title = this.state.inputText
+        if (title === "") {
+            return
+        }
+        const index = this.state.currentIndex + 1
+        const newTodo = {index: index, title: title, done: false}
+        const todo = [...this.state.todo, newTodo]
+        this.setState({
+            todo: todo,
+            currentIndex: index,
+            inputText: ""
+        })
     }
 
     render() {
         return (
-            <View style={styles.container}>
+            <KeyboardAvoidingView style={styles.container} behavior="padding">
                 <View style={styles.filter}>
                     <Text>Filterがここに配置されます。</Text>
                 </View>
                 <ScrollView style={styles.todolist}>
+                    <FlatList
+                        data={this.state.todo}
+                        renderItem={(item) => <Text>{item.title}</Text>}
+                        keyExtractor={(item, index) => 'todo_' + item.index}
+                    />
                     <Text>Todoリストがここに配置されます</Text>
                 </ScrollView>
                 <View style={styles.input}>
-                    <Text>テキスト入力がここに配置されます</Text>
+                    <TextInput
+                        onChangeText={(text) => this.setState({inputText: text})}
+                        value={this.state.inputText}
+                        style={styles.inputText}
+                    />
+                    <Button
+                        title="Add"
+                        onPress={this.onAddItem}
+                        color="#841584"
+                        style={styles.inputButton}
+                    />
                 </View>
-            </View>
+            </KeyboardAvoidingView>
         );
     }
 }
@@ -44,8 +76,8 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: STATUSBAR_HEIGHT,
         backgroundColor: '#fff',
-        // alignItems: 'center',
-        // justifyContent: 'center',
+        // alignItems: ' center',
+        // justifyContent: ' center',
     },
     filter: {
         height: 30,
@@ -54,6 +86,14 @@ const styles = StyleSheet.create({
         flex: 1
     },
     input: {
-        height: 30
+        height: 30,
+        flexDirection: 'row'
+    },
+    inputText: {
+        flex: 1
+    },
+    inputButton: {
+        width: 100
     }
+
 });

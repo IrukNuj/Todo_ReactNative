@@ -16,11 +16,13 @@ const STATUSBAR_HEIGHT = Platform.OS == 'ios' ? 20 : StatusBar.currentHeight
 
 export default class App extends React.Component {
     constructor(props) {
-        super()
+        super(props)
         this.state = {
-            todo: [],
+            todo: [
+                {index: 'index', title: 'title', done: false}
+            ],
             currentIndex: 0,
-            inputText: ""
+            inputText: "",
         }
     }
 
@@ -48,8 +50,8 @@ export default class App extends React.Component {
                 <ScrollView style={styles.todolist}>
                     <FlatList
                         data={this.state.todo}
-                        renderItem={(item) => <Text>{item.title}</Text>}
-                        keyExtractor={(item, index) => 'todo_' + item.index}
+                        renderItem={({item}) => <Text>{item.title}</Text>}
+                        keyExtractor={(item) => "todo_" + item.index}
                     />
                     <Text>Todoリストがここに配置されます</Text>
                 </ScrollView>

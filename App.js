@@ -121,7 +121,14 @@ export default class App extends React.Component {
                 <ScrollView style={styles.todolist}>
                     <FlatList
                         data={todo}
-                        renderItem={({item}) => <Text>{item.title}</Text>}
+                        extraDate = {this.state}
+                        renderItem={({item}) =>
+                            <TodoItem
+                                title={item.title}
+                                done={item.done}
+                                onTapTodoItem={() => this.onTapTodoItem(item)}
+                            />
+                        }
                         keyExtractor={(item) => "todo_" + item.index}
                     />
                     <Text>Todoリストがここに配置されます</Text>
@@ -167,6 +174,14 @@ const styles = StyleSheet.create({
     },
     inputButton: {
         width: 100
+    },
+    todoItem: {
+        fontSize: 20,
+        backgroundColor: "white"
+    },
+    todoItemDone: {
+        fontSize: 20,
+        backgroundColor: "red"
     }
 
 });

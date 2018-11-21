@@ -10,11 +10,24 @@ import {
     TextInput,
     Button,
     KeyboardAvoidingView,
-    AsyncStorage
+    AsyncStorage,
+    TouchableOpacity
 } from 'react-native';
 
 const STATUSBAR_HEIGHT = Platform.OS == 'ios' ? 20 : StatusBar.currentHeight
 const TODO = "@todoapp.todo"
+
+const TodoItem = (props) => {
+    let textStyle = styles.todoItem
+    if (props.done === true) {
+        textStyle = styles.todoItemDone
+    }
+    return (
+        <TouchableOpacity onPress={props.onTapTodoItem}>
+            <Text style={textStyle}> {props.title}_</Text>
+        </TouchableOpacity>
+    )
+}
 
 export default class App extends React.Component {
     constructor(props) {
@@ -32,20 +45,20 @@ export default class App extends React.Component {
         this.loadTodo()
     }
 
-    loadTodo = async ( ) => {
+    loadTodo = async () => {
         try {
             const  todoString = await AsyncStorage.getItem(TODO)
             if (todoString) {
                 const todo = JSON.parse(todoString)
                 const currentIndex = todo.length
-                this.setState({todo: todo,currentIndex: currentIndex})
+                this.setState({todo: todo, currentIndex: currentIndex})
             }
         } catch (e) {
             console.log(e)
         }
     }
 
-    saveTodo = async (Todo) => {
+    saveTodo = async (todo) => {
         try {
             const todoString = JSON.stringify(todo)
             await AsyncStorage.setItem(TODO, todoString)
@@ -54,6 +67,14 @@ export default class App extends React.Component {
         }
     }
 
+    onTapTodoItem =　(todoItem) => {
+        const todo = this.state.todo
+        const index = todo.indexOf(todoItem)
+        todoItem.done = !todoItem.done
+        todo[index] = todoItem
+        this.setState({todo: todo})
+        this.saveTodo(todo)
+    }
 
     onAddItem = () => {
         const title = this.state.inputText
@@ -66,20 +87,31 @@ export default class App extends React.Component {
         this.setState({
             todo: todo,
             currentIndex: index,
-            inputText: ""
+            inputText: "",
+            filterText: ""
         })
-        this.saveTodo()
+        this.saveTodo(todo)
     }
 
     render() {
+        const filterText = this.state.filterText
+        let todo = this.state.todo
+        if (filterText !== "") {
+            todo = todo.filter(t => t.title.includes(filterText))
+        }
         return (
             <KeyboardAvoidingView style={styles.container} behavior="padding">
                 <View style={styles.filter}>
-                    <Text>Filterがここに配置されます。</Text>
+                    <TextInput
+                        onchangeText={(text) => this.setState({filterText: text})}
+                        value={this.state.filterText}
+                        style={styles.inputText}
+                        placeholder="Type filter text"
+                    />
                 </View>
                 <ScrollView style={styles.todolist}>
                     <FlatList
-                        data={this.state.todo}
+                        data={todo}
                         renderItem={({item}) => <Text>{item.title}</Text>}
                         keyExtractor={(item) => "todo_" + item.index}
                     />

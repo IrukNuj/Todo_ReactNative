@@ -93,6 +93,15 @@ export default class App extends React.Component {
         this.saveTodo(todo)
     }
 
+    onTapTodoItem = (todoItem)=>{
+        const todo = this.state.todo
+        const index = todo.indexOf(todoItem)
+        todoItem.done = !todoItem.done
+        todo[index] = todoItem
+        this.setState({todo: todo})
+        this.saveTodo(todo)
+    }
+
     render() {
         const filterText = this.state.filterText
         let todo = this.state.todo
